@@ -8,14 +8,20 @@ Implements a favorites/watchlist system using Zustand with persist middleware (l
 
 ## Files
 
-| File | Type | Purpose |
-|------|------|---------|
-| `store/favoritesStore.ts` | Zustand Store | Favorites state with persist middleware |
-| `store/searchStore.ts` | Zustand Store | Search and filter global state |
-| `store/types.ts` | Types | Store type definitions |
-| `app/favorites/page.tsx` | Client Component | Favorites listing page |
-| `components/FavoriteButton.tsx` | Client Component | Toggle button (shared) |
-| `components/EmptyState.tsx` | Client Component | "No favorites" placeholder |
+| File | Type | Purpose | Status |
+|------|------|---------|--------|
+| `src/store/favoritesStore.ts` | Zustand Store | Favorites state with persist middleware | ❌ Not started |
+| `src/store/searchStore.ts` | Zustand Store | Search and filter global state | ❌ Not started |
+| `src/store/types.ts` | Types | Store type definitions | ❌ Not started |
+| `src/app/favorites/page.tsx` | Client Component | Favorites listing page | ❌ Not started |
+| `src/components/FavoriteButton.tsx` | Client Component | Toggle button (shared) | ❌ Not started |
+| `src/components/EmptyState.tsx` | Client Component | "No favorites" placeholder | ❌ Not started |
+
+**Note:** Zustand is already installed (`zustand@^5.0.13`).
+
+---
+
+## Module Status: ❌ NOT STARTED
 
 ---
 

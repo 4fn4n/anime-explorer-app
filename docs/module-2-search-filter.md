@@ -30,13 +30,17 @@ GET https://api.jikan.moe/v4/genres/anime
 
 ## Files
 
-| File | Type | Purpose |
-|------|------|---------|
-| `components/SearchBar.tsx` | Client Component | Text input with debounce |
-| `components/FilterDropdowns.tsx` | Client Component | Type, genre, rating dropdowns |
-| `components/SearchFiltersWrapper.tsx` | Client Component | Orchestrates search + filters, syncs URL |
-| `store/searchStore.ts` | Zustand Store | Global state for query, type, genre, rating |
-| `lib/jikan.ts` | Utility | Extended with filter params support |
+| File | Type | Purpose | Status |
+|------|------|---------|--------|
+| `src/components/SearchBar.tsx` | Client Component | Text input with debounce | ❌ Not started |
+| `src/components/FilterDropdowns.tsx` | Client Component | Type, genre, rating dropdowns | ❌ Not started |
+| `src/components/SearchFiltersWrapper.tsx` | Client Component | Orchestrates search + filters, syncs URL | ❌ Not started |
+| `src/store/searchStore.ts` | Zustand Store | Global state for query, type, genre, rating | ❌ Not started |
+| `src/services/jikan.ts` | Utility | Extended with filter params support | ⚠️ Partially done (`FetchAnimeListParams` already supports q, type, rating, genres) |
+
+---
+
+## Module Status: ❌ NOT STARTED
 
 ---
 

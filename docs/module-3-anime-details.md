@@ -52,15 +52,19 @@ interface AnimeFullResponse {
 
 ## Files
 
-| File | Type | Purpose |
-|------|------|---------|
-| `app/anime/[id]/page.tsx` | Server Component | Fetches anime details, renders layout |
-| `app/anime/[id]/loading.tsx` | Server Component | Skeleton loading state |
-| `app/anime/[id]/error.tsx` | Client Component | Error boundary |
-| `components/AnimeDetail.tsx` | Client Component | Full detail display with favorite button |
-| `components/FavoriteButton.tsx` | Client Component | Toggle add/remove from favorites |
-| `lib/jikan.ts` | Utility | `fetchAnimeById(id)` function |
-| `types/anime.ts` | Types | `AnimeDetail` interface |
+| File | Type | Purpose | Status |
+|------|------|---------|--------|
+| `src/app/anime/[id]/page.tsx` | Server Component | Fetches anime details, renders layout | ❌ Not started |
+| `src/app/anime/[id]/loading.tsx` | Server Component | Skeleton loading state | ❌ Not started |
+| `src/app/anime/[id]/error.tsx` | Client Component | Error boundary | ❌ Not started |
+| `src/components/AnimeDetail.tsx` | Client Component | Full detail display with favorite button | ❌ Not started |
+| `src/components/FavoriteButton.tsx` | Client Component | Toggle add/remove from favorites | ❌ Not started |
+| `src/services/jikan.ts` | Utility | `getAnimeById(id)` function | ✅ Done |
+| `src/types/anime.ts` | Types | `AnimeDetail`, `Studio` interfaces | ✅ Done |
+
+---
+
+## Module Status: ❌ NOT STARTED
 
 ---
 

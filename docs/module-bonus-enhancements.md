@@ -352,11 +352,21 @@ useEffect(() => {
 
 ## Implementation Priority
 
-| Priority | Feature | Effort | Impact |
-|----------|---------|--------|--------|
-| 1 | Dark Mode (B.4) | Low | High (UX) |
-| 2 | Request Cancellation (B.6) | Low | Medium (stability) |
-| 3 | SSR/ISR (B.1) | Low | Medium (performance) |
-| 4 | React Query (B.2) | Medium | High (DX + UX) |
-| 5 | Framer Motion (B.5) | Medium | High (polish) |
-| 6 | Infinite Scroll (B.3) | Medium | Medium (UX) |
+| Priority | Feature | Effort | Impact | Status |
+|----------|---------|--------|--------|--------|
+| 1 | Dark Mode (B.4) | Low | High (UX) | Partial (dark: classes used, no toggle yet) |
+| 2 | Request Cancellation (B.6) | Low | Medium (stability) | Not started |
+| 3 | SSR/ISR (B.1) | Low | Medium (performance) | SSR in use, ISR not yet |
+| 4 | React Query (B.2) | Medium | High (DX + UX) | Not started |
+| 5 | Framer Motion (B.5) | Medium | High (polish) | Not started |
+| 6 | Infinite Scroll (B.3) | Medium | Medium (UX) | Not started |
+
+---
+
+## Module Status: NOT STARTED
+
+**Notes:**
+- Package manager: `pnpm` (not npm)
+- All files under `src/` directory
+- Services in `src/services/` (not `lib/`)
+- API calls proxied through `src/app/api/jikan/route.ts`
