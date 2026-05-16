@@ -26,7 +26,7 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className={`text-sm font-medium transition-colors ${
+              className={`rounded text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 ${
                 pathname === link.href
                   ? "text-blue-600 dark:text-blue-400"
                   : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"

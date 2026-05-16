@@ -18,7 +18,7 @@ export default function AnimeCard({ anime }: AnimeCardProps) {
   return (
     <Link
       href={`/anime/${anime.mal_id}`}
-      className="group block rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md hover:-translate-y-1 dark:border-gray-700 dark:bg-gray-800"
+      className="group block rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 dark:border-gray-700 dark:bg-gray-800"
     >
       <div className="relative aspect-3/4 w-full overflow-hidden rounded-t-lg">
         <Image

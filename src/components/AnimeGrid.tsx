@@ -7,8 +7,8 @@ export default function AnimeGrid({ anime }: { anime: Anime[] }) {
   if (anime) {
     return (
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {anime.map((item) => (
-          <AnimeCard key={item.mal_id} anime={item} />
+        {anime.map((item, index) => (
+          <AnimeCard key={index} anime={item} />
         ))}
       </div>
     );

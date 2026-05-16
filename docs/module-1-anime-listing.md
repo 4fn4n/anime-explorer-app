@@ -53,6 +53,7 @@ interface AnimeListResponse {
 | `src/components/AnimeGrid.tsx` | Client Component | Responsive grid wrapper | ✅ Done |
 | `src/components/Pagination.tsx` | Client Component | Page navigation with URL params | ✅ Done |
 | `src/components/Navbar.tsx` | Client Component | Sticky nav with logo, Browse/Favorites links | ✅ Done |
+| `src/components/SelectFilter.tsx` | Client Component | Reusable select dropdown with custom chevron icon | ✅ Done |
 | `src/services/jikan.ts` | Utility | API fetch helpers (`getAnimeList`, `getAnimeById`) | ✅ Done |
 | `src/types/anime.ts` | Types | TypeScript interfaces for API responses | ✅ Done |
 | `src/types/css.d.ts` | Types | CSS module type declarations (needed for Next.js 15) | ✅ Done |
@@ -125,11 +126,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const limit = Number(params.limit) || 12;
 
   const data = await getAnimeList({ page, limit });
+  const genreData = await getGenres();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <h1>Anime Explorer</h1>
       <Suspense fallback={null}>
+        <SearchFiltersWrapper genres={genreData.data} />
         <AnimeGrid anime={data.data} />
         <Pagination pagination={data.pagination} />
       </Suspense>

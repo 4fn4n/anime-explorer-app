@@ -2,7 +2,7 @@
 
 ## Overview
 
-Adds search and filter capabilities to the anime listing. Users can search by title and filter by type, genre, and rating. State is managed globally via Zustand and synced with URL query parameters.
+Adds search and filter capabilities to the anime listing. Users can search by title and filter by type, genre, and rating. State is managed via URL search params (single source of truth), read and updated through `useSearchParams()` and `router.push()` in `SearchFiltersWrapper`.
 
 ---
 
@@ -32,42 +32,18 @@ GET https://api.jikan.moe/v4/genres/anime
 
 | File | Type | Purpose | Status |
 |------|------|---------|--------|
-| `src/components/SearchBar.tsx` | Client Component | Text input with debounce | ❌ Not started |
-| `src/components/FilterDropdowns.tsx` | Client Component | Type, genre, rating dropdowns | ❌ Not started |
-| `src/components/SearchFiltersWrapper.tsx` | Client Component | Orchestrates search + filters, syncs URL | ❌ Not started |
-| `src/store/searchStore.ts` | Zustand Store | Global state for query, type, genre, rating | ❌ Not started |
-| `src/services/jikan.ts` | Utility | Extended with filter params support | ⚠️ Partially done (`FetchAnimeListParams` already supports q, type, rating, genres) |
+| `src/components/SearchBar.tsx` | Client Component | Text input with debounce (300ms) and race-condition prevention | ✅ Done |
+| `src/components/FilterDropdowns.tsx` | Client Component | Type, genre, rating dropdowns using `SelectFilter` | ✅ Done |
+| `src/components/SelectFilter.tsx` | Client Component | Reusable select dropdown with custom chevron icon | ✅ Done |
+| `src/components/SearchFiltersWrapper.tsx` | Client Component | Orchestrates search + filters, updates URL params | ✅ Done |
+| `src/services/jikan.ts` | Utility | Extended with `getGenres()` + filter params | ✅ Done |
+| `src/types/anime.ts` | Types | Added `GenreListResponse` | ✅ Done |
+
+**Note:** Zustand store (`src/store/searchStore.ts`) was not needed — URL search params serve as the single source of truth, read via `useSearchParams()` in `SearchFiltersWrapper`.
 
 ---
 
-## Module Status: ❌ NOT STARTED
-
----
-
-## Zustand Store Definition
-
-```typescript
-// store/searchStore.ts
-
-interface SearchState {
-  query: string;
-  type: string;
-  genre: string;
-  rating: string;
-  page: number;
-}
-
-interface SearchActions {
-  setQuery: (query: string) => void;
-  setType: (type: string) => void;
-  setGenre: (genre: string) => void;
-  setRating: (rating: string) => void;
-  setPage: (page: number) => void;
-  resetFilters: () => void;
-}
-
-export type SearchStore = SearchState & SearchActions;
-```
+## Module Status: ✅ COMPLETE
 
 ---
 
@@ -76,39 +52,48 @@ export type SearchStore = SearchState & SearchActions;
 ### `components/SearchBar.tsx` (Client Component)
 
 **Behavior:**
-- Controlled input connected to Zustand `query` state
-- Debounced (300ms) before triggering URL update
+- Controlled input with local state + debounce (300ms)
+- Uses `pendingRef` to prevent race conditions (external value sync doesn't override pending local edits)
 - Resets page to 1 on new search
-- Clear button to reset search
+- Clear button immediately fires `onChange("")`
 
 **Implementation Notes:**
 ```typescript
 "use client";
 
-// Uses useEffect + setTimeout for debounce
-// Updates URL searchParams via useRouter().push()
-// Syncs initial value from URL on mount
+// Local state tracks input value
+// pendingRef prevents external value from overwriting user's in-progress edits
+// Debounce via useEffect + setTimeout (300ms)
+// Clear button calls both setInput("") and onChange("") immediately
 ```
+
+### `components/SelectFilter.tsx` (Client Component)
+
+**Behavior:**
+- Reusable select component with `appearance-none` and custom `ChevronDownIcon`
+- Accepts `value`, `onChange`, and `options` props
+- Truncates overflow text with ellipsis
+- Consistent focus ring styling (blue)
 
 ### `components/FilterDropdowns.tsx` (Client Component)
 
 **Dropdowns:**
 1. **Type** — Static list: TV, Movie, OVA, Special, ONA, Music
 2. **Rating** — Static list: G, PG, PG-13, R-17+, R+, Rx
-3. **Genre** — Fetched from `/genres/anime` on mount (cached)
+3. **Genre** — Fetched from `/genres/anime` (passed as prop from server component)
 
 **Behavior:**
-- Each dropdown updates corresponding Zustand state
-- Resets page to 1 when filter changes
-- "Clear All" button resets all filters
+- Each dropdown uses `SelectFilter` component
+- "Clear All" button resets all filters (visible only when filters are active)
 
 ### `components/SearchFiltersWrapper.tsx` (Client Component)
 
 **Responsibilities:**
 - Renders SearchBar + FilterDropdowns
-- Handles URL ↔ Zustand synchronization
-- On mount: reads URL params → populates Zustand
-- On state change: updates URL params → triggers server re-render
+- Reads current filter values from URL via `useSearchParams()`
+- `updateParam(key, value)` — sets or deletes a single URL param and navigates
+- `handleReset()` — navigates to `/?page=1` to clear all filters
+- Uses `useCallback` for stable function references (prevents SearchBar debounce reset)
 
 ---
 
@@ -118,12 +103,6 @@ export type SearchStore = SearchState & SearchActions;
 ┌─────────────────────────────────────────────────────────┐
 │                     User Interaction                      │
 │         (types in search / selects filter)               │
-└─────────────────────┬───────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────┐
-│                   Zustand Store                           │
-│         (query, type, genre, rating, page)               │
 └─────────────────────┬───────────────────────────────────┘
                       │
                       ▼
@@ -143,13 +122,13 @@ export type SearchStore = SearchState & SearchActions;
 
 ## URL Parameter Mapping
 
-| Zustand Field | URL Param | Example |
-|---------------|-----------|---------|
-| `query` | `q` | `?q=naruto` |
-| `type` | `type` | `?type=tv` |
-| `genre` | `genres` | `?genres=1` |
-| `rating` | `rating` | `?rating=pg13` |
-| `page` | `page` | `?page=2` |
+| Field | URL Param | Example |
+|-------|-----------|---------|
+| Search query | `q` | `?q=naruto` |
+| Type filter | `type` | `?type=tv` |
+| Genre filter | `genres` | `?genres=1` |
+| Rating filter | `rating` | `?rating=pg13` |
+| Page number | `page` | `?page=2` |
 
 Combined: `/?q=naruto&type=tv&genres=1&rating=pg13&page=1`
 
@@ -158,34 +137,25 @@ Combined: `/?q=naruto&type=tv&genres=1&rating=pg13&page=1`
 ## Debounce Implementation
 
 ```typescript
-// Debounce search input to avoid API spam
-const [localQuery, setLocalQuery] = useState(query);
+// SearchBar uses local state + pendingRef to debounce and prevent race conditions
+const [input, setInput] = useState(value);
+const pendingRef = useRef(false);
 
+// Skip external sync while user is typing
 useEffect(() => {
+  if (!pendingRef.current) setInput(value);
+}, [value]);
+
+// Debounce: only fire onChange after 300ms of inactivity
+useEffect(() => {
+  if (input === value) { pendingRef.current = false; return; }
+  pendingRef.current = true;
   const timer = setTimeout(() => {
-    setQuery(localQuery);
+    pendingRef.current = false;
+    onChange(input);
   }, 300);
   return () => clearTimeout(timer);
-}, [localQuery]);
-```
-
----
-
-## Optional: Request Cancellation
-
-```typescript
-// Using AbortController to cancel in-flight requests
-const controllerRef = useRef<AbortController | null>(null);
-
-const fetchWithCancel = async (params: SearchParams) => {
-  controllerRef.current?.abort();
-  controllerRef.current = new AbortController();
-
-  const response = await fetch(buildUrl(params), {
-    signal: controllerRef.current.signal,
-  });
-  // ...
-};
+}, [input, value, onChange]);
 ```
 
 ---
@@ -193,8 +163,8 @@ const fetchWithCancel = async (params: SearchParams) => {
 ## Responsive Design
 
 - Search bar: Full width on mobile, constrained on desktop
-- Filters: Stack vertically on mobile, horizontal row on desktop
-- Use `flex-wrap` or grid layout for filter section
+- Filters: Stack vertically on mobile, horizontal row on desktop (`flex-wrap`)
+- Select dropdowns: Fixed width with text truncation for overflow
 
 ```html
 <div class="flex flex-col md:flex-row gap-3">

@@ -23,7 +23,7 @@ export default function Pagination({ pagination }: PaginationProps) {
     <div className="mt-8 flex items-center justify-center gap-4">
       <Link
         href={buildPageUrl(currentPage - 1)}
-        className={`rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700 ${
+        className={`rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 dark:border-gray-600 dark:hover:bg-gray-700 ${
           currentPage <= 1
             ? "pointer-events-none opacity-50"
             : ""
@@ -39,7 +39,7 @@ export default function Pagination({ pagination }: PaginationProps) {
 
       <Link
         href={buildPageUrl(currentPage + 1)}
-        className={`rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700 ${
+        className={`rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 dark:border-gray-600 dark:hover:bg-gray-700 ${
           !pagination.has_next_page
             ? "pointer-events-none opacity-50"
             : ""

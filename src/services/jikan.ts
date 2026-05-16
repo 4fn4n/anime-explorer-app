@@ -1,4 +1,4 @@
-import { AnimeListResponse, AnimeDetail } from "@/types/anime";
+import { AnimeListResponse, AnimeDetail, GenreListResponse } from "@/types/anime";
 
 const INTERNAL_API = "/api/jikan";
 
@@ -54,4 +54,19 @@ export async function getAnimeById(id: number): Promise<AnimeDetail> {
 
   const data = await res.json();
   return data.data;
+}
+
+export async function getGenres(): Promise<GenreListResponse> {
+  const searchParams = new URLSearchParams();
+  searchParams.set("path", "/genres/anime");
+
+  const url = `${getBaseUrl()}${INTERNAL_API}?${searchParams.toString()}`;
+
+  const res = await fetch(url, { next: { revalidate: 86400 } });
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch genres: ${res.status} ${res.statusText}`);
+  }
+
+  return res.json();
 }
