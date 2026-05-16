@@ -1,0 +1,29 @@
+import { Suspense } from "react";
+import { getAnimeList } from "@/services/jikan";
+import AnimeGrid from "@/components/AnimeGrid";
+import Pagination from "@/components/Pagination";
+
+interface HomePageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const params = await searchParams;
+  const page = Number(params.page) || 1;
+  const limit = Number(params.limit) || 12;
+
+  const data = await getAnimeList({ page, limit });
+
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">
+        Anime Explorer
+      </h1>
+
+      <Suspense fallback={null}>
+        <AnimeGrid anime={data.data} />
+        <Pagination pagination={data.pagination} />
+      </Suspense>
+    </div>
+  );
+}
