@@ -12,14 +12,12 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
   const [input, setInput] = useState(value);
   const pendingRef = useRef(false);
 
-  // Sync external value changes only when no local change is pending
   useEffect(() => {
     if (!pendingRef.current) {
       setInput(value);
     }
   }, [value]);
 
-  // Debounce input → onChange
   useEffect(() => {
     if (input === value) {
       pendingRef.current = false;
@@ -30,7 +28,7 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
     const timer = setTimeout(() => {
       pendingRef.current = false;
       onChange(input);
-    }, 300);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [input, value, onChange]);

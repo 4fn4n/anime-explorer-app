@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FilmIcon } from "@heroicons/react/24/solid";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -35,6 +36,7 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+          <ThemeToggle />
         </div>
       </div>
     </nav>

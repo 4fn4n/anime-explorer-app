@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useSearchStore } from "@/store/searchStore";
 import { PaginationInfo } from "@/types/anime";
 
 interface PaginationProps {
@@ -10,12 +11,13 @@ interface PaginationProps {
 
 export default function Pagination({ pagination }: PaginationProps) {
   const searchParams = useSearchParams();
+  const { setPage } = useSearchStore();
   const currentPage = pagination.current_page;
   const lastPage = pagination.last_visible_page;
 
   function buildPageUrl(page: number): string {
     const params = new URLSearchParams(searchParams.toString());
-    page ? params.set("limit", String(page)):params.set("limit", String(1));
+    params.set("page", String(page));
     return `/?${params.toString()}`;
   }
 
@@ -23,6 +25,7 @@ export default function Pagination({ pagination }: PaginationProps) {
     <div className="mt-8 flex items-center justify-center gap-4">
       <Link
         href={buildPageUrl(currentPage - 1)}
+        onClick={() => setPage(currentPage - 1)}
         className={`rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 dark:border-gray-600 dark:hover:bg-gray-700 ${
           currentPage <= 1
             ? "pointer-events-none opacity-50"
@@ -39,6 +42,7 @@ export default function Pagination({ pagination }: PaginationProps) {
 
       <Link
         href={buildPageUrl(currentPage + 1)}
+        onClick={() => setPage(currentPage + 1)}
         className={`rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 dark:border-gray-600 dark:hover:bg-gray-700 ${
           !pagination.has_next_page
             ? "pointer-events-none opacity-50"

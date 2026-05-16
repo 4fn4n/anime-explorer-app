@@ -1,19 +1,40 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { StarIcon } from "@heroicons/react/24/solid";
+import { HeartIcon } from "@heroicons/react/24/outline";
+import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid";
 import { Anime } from "@/types/anime";
+import { useFavoritesStore } from "@/store/favoritesStore";
 
 interface AnimeCardProps {
   anime: Anime;
 }
 
 export default function AnimeCard({ anime }: AnimeCardProps) {
+  const { addFavorite, removeFavorite, isFavorite } = useFavoritesStore();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  const favorited = mounted && isFavorite(anime.mal_id);
+
   const imageUrl =
     anime.images?.jpg?.large_image_url ||
     anime.images?.jpg?.image_url ||
     "";
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (favorited) {
+      removeFavorite(anime.mal_id);
+    } else {
+      addFavorite(anime);
+    }
+  };
 
   return (
     <Link
@@ -34,6 +55,19 @@ export default function AnimeCard({ anime }: AnimeCardProps) {
             {anime.score.toFixed(1)}
           </div>
         )}
+        <button
+          onClick={handleFavoriteClick}
+          className={`absolute top-2 left-2 rounded-full bg-black/70 p-1.5 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+            favorited ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          }`}
+          aria-label={favorited ? "Remove from favorites" : "Add to favorites"}
+        >
+          {favorited ? (
+            <HeartSolidIcon className="h-4 w-4 text-red-500" />
+          ) : (
+            <HeartIcon className="h-4 w-4 text-white" />
+          )}
+        </button>
       </div>
       <div className="p-3">
         <h3 className="line-clamp-2 text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -46,8 +80,8 @@ export default function AnimeCard({ anime }: AnimeCardProps) {
             </span>
           )}
           {anime.episodes && (
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {anime.episodes} eps
+            <span className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+              {anime.episodes} eps 
             </span>
           )}
         </div>

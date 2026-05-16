@@ -1,36 +1,124 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Anime Explorer
 
-## Getting Started
+A responsive anime browsing application built with Next.js 15, featuring search, filtering, favorites, and dark mode. Data is fetched from the [Jikan API](https://jikan.moe/) (unofficial MyAnimeList API).
 
-First, run the development server:
+## Features
+
+- Browse anime with paginated grid layout
+- Search by title with debounced input
+- Filter by type, rating, and genre
+- Anime detail pages with synopsis, trailer, and metadata
+- Favorites system persisted to localStorage
+- Dark/light mode toggle
+- Staggered card animations (Framer Motion)
+- Fully responsive (mobile → desktop)
+
+## Tech Stack
+
+- **Framework:** Next.js 15 (App Router, Server Components)
+- **Language:** TypeScript (strict mode)
+- **Styling:** Tailwind CSS v4
+- **State Management:** Zustand (search, favorites, theme stores)
+- **Animations:** Framer Motion
+- **Icons:** Heroicons v2
+- **Package Manager:** pnpm
+
+## Setup & Run
+
+### Prerequisites
+
+- Node.js 18+
+- pnpm (`npm install -g pnpm`)
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repo-url>
+cd anime-explorer-app
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env.local` file:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+JIKAN_API_URL=https://api.jikan.moe/v4
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
 
-## Learn More
+### Development
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Build & Production
 
-## Deploy on Vercel
+```bash
+pnpm build
+pnpm start
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Architecture
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Rendering Strategy
+
+- **Server Components** (`page.tsx`) handle data fetching — no client-side waterfalls
+- **Client Components** handle interactivity (search input, filters, favorites toggle)
+- **ISR** (Incremental Static Regeneration) on anime detail pages (1-hour revalidation)
+- API calls proxied through `/api/jikan` route to hide external URLs
+
+### State Management (Zustand)
+
+| Store | Purpose | Persistence |
+|-------|---------|-------------|
+| `searchStore` | Search query, filters, pagination | Synced with URL params |
+| `favoritesStore` | Saved anime list | localStorage |
+| `themeStore` | Dark/light mode preference | localStorage |
+
+All stores use typed interfaces for state and actions. Components access stores directly via hooks — no prop drilling.
+
+### Component Separation
+
+```
+src/
+├── app/                    # Routes & layouts (Server Components)
+│   ├── page.tsx            # Home (anime listing)
+│   ├── favorites/page.tsx  # Favorites page
+│   └── anime/[id]/page.tsx # Anime detail page
+├── components/             # Reusable UI (Client Components)
+│   ├── AnimeCard.tsx       # Grid card with hover favorite
+│   ├── AnimeGrid.tsx       # Animated grid wrapper
+│   ├── SearchBar.tsx       # Debounced search input
+│   ├── FilterDropdowns.tsx # Type/rating/genre filters
+│   ├── SelectFilter.tsx    # Reusable select dropdown
+│   ├── Pagination.tsx      # Page navigation
+│   ├── FavoriteButton.tsx  # Toggle favorite (detail page)
+│   ├── Navbar.tsx          # Navigation + theme toggle
+│   └── ThemeProvider.tsx   # Dark mode context
+├── store/                  # Zustand stores
+├── services/               # API fetch helpers
+└── types/                  # TypeScript interfaces
+```
+
+### Responsiveness
+
+- **Mobile (< 640px):** Single column grid, stacked filters
+- **Tablet (640–1024px):** 2-column grid
+- **Desktop (> 1024px):** 4-column grid
+- Filters wrap with `flex-wrap`, search bar is full-width
+- Dark mode supported across all breakpoints
+
+### API Integration
+
+All requests go through `src/app/api/jikan/route.ts` (server-side proxy):
+- Hides external API URL from client
+- Allows server-side caching (`revalidate`)
+- Rate-limit aware (Jikan: 3 req/sec)
+
+## Deployment
+
+Deploy on [Vercel](https://vercel.com) — auto-detects Next.js. Set environment variables in the Vercel dashboard.

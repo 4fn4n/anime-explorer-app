@@ -20,7 +20,6 @@ const ANIME_RATINGS = [
   { value: "pg13", label: "PG-13 - Teens 13+" },
   { value: "r17", label: "R - 17+" },
   { value: "r", label: "R+ - Mild Nudity" },
-  { value: "rx", label: "Rx - Hentai" },
 ];
 
 interface FilterDropdownsProps {
