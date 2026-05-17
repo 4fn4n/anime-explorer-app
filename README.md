@@ -4,13 +4,15 @@ A responsive anime browsing application built with Next.js 15, featuring search,
 
 ## Features
 
-- Browse anime with paginated grid layout
-- Search by title with debounced input
+- Browse anime with infinite scroll (IntersectionObserver)
+- Search by title with debounced input (500ms)
 - Filter by type, rating, and genre
 - Anime detail pages with synopsis, trailer, and metadata
 - Favorites system persisted to localStorage
 - Dark/light mode toggle
 - Staggered card animations (Framer Motion)
+- Mobile burger menu navigation
+- `cn` utility (clsx + tailwind-merge) for class merging
 - Fully responsive (mobile → desktop)
 
 ## Tech Stack
@@ -20,6 +22,7 @@ A responsive anime browsing application built with Next.js 15, featuring search,
 - **Styling:** Tailwind CSS v4
 - **State Management:** Zustand (search, favorites, theme stores)
 - **Animations:** Framer Motion
+- **Utilities:** clsx + tailwind-merge (`cn`)
 - **Icons:** Heroicons v2
 - **Package Manager:** pnpm
 
@@ -76,6 +79,7 @@ pnpm start
 | Store | Purpose | Persistence |
 |-------|---------|-------------|
 | `searchStore` | Search query, filters, pagination | Synced with URL params |
+| `animeListStore` | Anime list, page, loading, loadMore | In-memory (seeded from server) |
 | `favoritesStore` | Saved anime list | localStorage |
 | `themeStore` | Dark/light mode preference | localStorage |
 
@@ -92,24 +96,27 @@ src/
 ├── components/             # Reusable UI (Client Components)
 │   ├── AnimeCard.tsx       # Grid card with hover favorite
 │   ├── AnimeGrid.tsx       # Animated grid wrapper
-│   ├── SearchBar.tsx       # Debounced search input
-│   ├── FilterDropdowns.tsx # Type/rating/genre filters
-│   ├── SelectFilter.tsx    # Reusable select dropdown
-│   ├── Pagination.tsx      # Page navigation
+│   ├── InfiniteAnimeList.tsx # Infinite scroll container
+│   ├── SearchBar.tsx       # Debounced search (reads store directly)
+│   ├── SearchFiltersWrapper.tsx # URL ↔ store sync
+│   ├── FilterDropdowns.tsx # Type/rating/genre filters (reads store directly)
+│   ├── SelectFilter.tsx    # Reusable select with cn()
+│   ├── Pagination.tsx      # Page navigation (legacy)
 │   ├── FavoriteButton.tsx  # Toggle favorite (detail page)
-│   ├── Navbar.tsx          # Navigation + theme toggle
+│   ├── Navbar.tsx          # Navigation + burger menu + theme toggle
 │   └── ThemeProvider.tsx   # Dark mode context
 ├── store/                  # Zustand stores
 ├── services/               # API fetch helpers
+├── lib/                    # Utilities (cn)
 └── types/                  # TypeScript interfaces
 ```
 
 ### Responsiveness
 
-- **Mobile (< 640px):** Single column grid, stacked filters
+- **Mobile (< 640px):** Single column grid, 2×2 filter grid, burger menu
 - **Tablet (640–1024px):** 2-column grid
-- **Desktop (> 1024px):** 4-column grid
-- Filters wrap with `flex-wrap`, search bar is full-width
+- **Desktop (> 1024px):** 4-column grid, inline filters
+- Filters use `grid-cols-2` on mobile, `flex` on desktop
 - Dark mode supported across all breakpoints
 
 ### API Integration
@@ -117,7 +124,6 @@ src/
 All requests go through `src/app/api/jikan/route.ts` (server-side proxy):
 - Hides external API URL from client
 - Allows server-side caching (`revalidate`)
-- Rate-limit aware (Jikan: 3 req/sec)
 
 ## Deployment
 
