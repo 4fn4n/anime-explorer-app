@@ -2,24 +2,21 @@
 
 import { useEffect, useRef, useState } from "react";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useSearchStore } from "@/store/searchStore";
 
-interface SearchBarProps {
-  value: string;
-  onChange: (value: string) => void;
-}
-
-export default function SearchBar({ value, onChange }: SearchBarProps) {
-  const [input, setInput] = useState(value);
+export default function SearchBar() {
+  const { query, setQuery } = useSearchStore();
+  const [input, setInput] = useState(query);
   const pendingRef = useRef(false);
 
   useEffect(() => {
     if (!pendingRef.current) {
-      setInput(value);
+      setInput(query);
     }
-  }, [value]);
+  }, [query]);
 
   useEffect(() => {
-    if (input === value) {
+    if (input === query) {
       pendingRef.current = false;
       return;
     }
@@ -27,11 +24,11 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
     pendingRef.current = true;
     const timer = setTimeout(() => {
       pendingRef.current = false;
-      onChange(input);
+      setQuery(input);
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [input, value, onChange]);
+  }, [input, query, setQuery]);
 
   return (
     <div className="relative">
@@ -47,7 +44,7 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
         <button
           onClick={() => {
             setInput("");
-            onChange("");
+            setQuery("");
           }}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
           aria-label="Clear search"
